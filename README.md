@@ -2,6 +2,7 @@ PassKit Ruby SDK
 =====================
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Gem Version](https://badge.fury.io/rb/passkit-ruby-grpc-sdk.svg)](https://badge.fury.io/rb/passkit-ruby-grpc-sdk)
 
 
 The PassKit IO SDK makes it quick and easy to create and manage your branded Digital Membership Cards for Apple Wallet and Google Pay.
@@ -20,7 +21,7 @@ The PassKit IO SDK makes it quick and easy to create and manage your branded Dig
    * Membership Cards 
    * Coupons
    * Boarding Passes
-   * Event Tickets _coming_soon_
+   * Event Tickets 
    
 
 ## Documentation
