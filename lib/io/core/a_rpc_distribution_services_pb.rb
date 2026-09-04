@@ -6,6 +6,7 @@ require 'io/core/a_rpc_distribution_pb'
 
 module Io
   module Distribution
+    # The PassKit Distribution API allows you to create SmartPass links and manage the distribution of digital passes to your customers via email.
     class Service
 
       include ::GRPC::GenericService
@@ -14,12 +15,23 @@ module Io
       self.unmarshal_class_method = :decode
       self.service_name = 'io.Distribution'
 
+      # Sends a welcome email to a single recipient using a valid pass protocol (e.g., membership, coupon, ticket). Required Fields: passId or externalId, classId, protocol.
       rpc :sendWelcomeEmail, ::Io::EmailDistributionRequest, ::Google::Protobuf::Empty
+      # Generates and returns an encrypted SmartPass link for a member, coupon, or event ticket based on the request payload. Required Fields: passId or externalId, classId.
       rpc :getSmartPassLink, ::Io::SmartPassLinkRequest, ::Io::Url
+      # Returns a list of fields to be displayed on the data collection page. For the Member protocol, classId is required. Required Fields: classId (only for MEMBERSHIP protocol)
       rpc :getDataCollectionPageFields, ::Io::ClassObjectInput, ::Io::DataCollectionFields
+      # Accepts a CSV file containing user data and a project short code, processes SmartPass creation, and sends results to the user via email. Required Fields: shortCode, csv contents.
       rpc :uploadSmartPassCsv, ::Io::SmartPassCsvUploadRequest, ::Google::Protobuf::Empty
+      # Imports and processes a formatted CSV file for a given protocol (e.g., member, coupon) and creates billable records. Required: classId, protocol, and valid csv contents.
       rpc :importProtocolCsv, ::Io::ImportProtocolRequest, ::Google::Protobuf::Empty
+      # Validates a time-based one-time password (TOTP) barcode string in the format {{payload}}||{{key}}||{{timestamp}}||{{totp}}. If valid, returns the cleaned payload without TOTP metadata. Required Fields: payload.
       rpc :validateBarcode, ::Io::Payload, ::Io::Payload
+      rpc :addMessage, ::Io::Message, ::Google::Protobuf::Empty
+      rpc :getMessage, ::Io::Id, ::Io::Message
+      rpc :getMessages, ::Google::Protobuf::Empty, stream(::Io::Message)
+      rpc :updateMessage, ::Io::Message, ::Google::Protobuf::Empty
+      rpc :cancelMessage, ::Io::Id, ::Google::Protobuf::Empty
     end
 
     Stub = Service.rpc_stub_class

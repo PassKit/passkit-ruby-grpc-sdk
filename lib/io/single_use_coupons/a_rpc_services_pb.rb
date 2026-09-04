@@ -2,13 +2,14 @@
 # Source: io/single_use_coupons/a_rpc.proto for package 'single_use_coupons'
 # Original file comments:
 # *
-# Single Use Coupon Protocol is suit for cases where the user requires a clean and simple single use coupon for short term coupon campaigns in Apple Wallet and Google Pay.
+# Single Use Coupon Protocol is suit for cases where the user requires a clean and simple single use coupon for short term coupon campaigns in Apple Wallet and Google Wallet.
 
 require 'grpc'
 require 'io/single_use_coupons/a_rpc_pb'
 
 module SingleUseCoupons
   module SingleUseCoupons
+    # Manages coupon campaigns, offers, coupon issuance, redemption, and voiding. Create a campaign and offer before issuing coupons.
     class Service
 
       include ::GRPC::GenericService
@@ -17,34 +18,65 @@ module SingleUseCoupons
       self.unmarshal_class_method = :decode
       self.service_name = 'single_use_coupons.SingleUseCoupons'
 
+      # Creates a new single-use coupon campaign with design, rules, and configuration settings. Required fields: name and status.
       rpc :createCouponCampaign, ::SingleUseCoupons::CouponCampaign, ::Io::Id
+      # Updates the configuration of an existing coupon campaign. Required fields: campaignId.
       rpc :updateCouponCampaign, ::SingleUseCoupons::CouponCampaign, ::SingleUseCoupons::CouponCampaign
+      # Retrieves the details of a specific coupon campaign by id. Required fields: campaignId.
       rpc :getCouponCampaign, ::Io::Id, ::SingleUseCoupons::CouponCampaign
+      # Deletes a coupon campaign by id. This also deletes its associated offer and voids all related coupons. Required fields: campaignId. Use with caution, as this action is irreversible.
       rpc :deleteCouponCampaign, ::Io::Id, ::Google::Protobuf::Empty
+      # Lists all coupon campaigns using basic pagination. This version uses the legacy request format and is maintained for backward compatibility. New integrations should use the updated listCouponCampaigns call instead  as OR operator is not supported.
       rpc :listCouponCampaignsDeprecated, ::Io::Pagination, stream(::SingleUseCoupons::CouponCampaign)
+      # Lists coupon campaigns with support for filters, sorting, and pagination.
       rpc :listCouponCampaigns, ::Io::Filters, stream(::SingleUseCoupons::CouponCampaign)
+      # Returns analytics data (e.g., redemptions, activations) for a given coupon campaign. Required fields: classId (e.g. campaignId) and protocol (query parameter).
       rpc :getAnalytics, ::Io::AnalyticsRequest, ::SingleUseCoupons::CouponCampaignAnalyticsResponse
+      # Creates an offer within a coupon campaign, including its pass design and redemption rules. Required fields: campaignId, offerTitle, offerDetails, beforeRedeemPassTemplateId.
       rpc :createCouponOffer, ::SingleUseCoupons::CouponOffer, ::Io::Id
+      # Updates an existing coupon offer’s settings, visuals, or redemption configuration. Required fields: campaignId, offerTitle, offerDetails, beforeRedeemPassTemplateId.
       rpc :updateCouponOffer, ::SingleUseCoupons::CouponOffer, ::SingleUseCoupons::CouponOffer
+      # Retrieves the full configuration of a coupon offer by ID. Required fields: offerId.
       rpc :getCouponOffer, ::Io::Id, ::SingleUseCoupons::CouponOffer
+      # Deletes a coupon offer and invalidates all associated coupons. Required fields: offerId. Use with caution, as this action is irreversible.
       rpc :deleteCouponOffer, ::Io::Id, ::Google::Protobuf::Empty
+      # Lists all coupon offers using basic filters. This version uses the legacy request format and is maintained for backward compatibility. New integrations should use the updated listCouponOffers call instead as OR operator is not supported.
       rpc :listCouponOffersDeprecated, ::SingleUseCoupons::CouponOffersListRequestDeprecated, stream(::SingleUseCoupons::CouponOffer)
+      # Lists coupon offers with support for filters, sorting, and pagination. Required fields: campaignId.
       rpc :listCouponOffers, ::SingleUseCoupons::CouponOffersListRequest, stream(::SingleUseCoupons::CouponOffer)
+      # Issues a unique coupon for an offer in a campaign. Required fields: campaignId, offerId, pass data.
       rpc :createCoupon, ::SingleUseCoupons::Coupon, ::Io::Id
+      # Updates an existing coupon’s metadata or personalisation. Required fields: coupon id ,or externalId, offerId and campaignId.
       rpc :updateCoupon, ::SingleUseCoupons::Coupon, ::Io::Id
+      # Streams updates for multiple coupons for batch processing.
       rpc :streamCouponUpdates, stream(::SingleUseCoupons::Coupon), stream(::Io::Id)
+      # Marks a coupon as redeemed and applies its redemption-specific design. Required fields: coupon ID, or externalId with offerId and campaignId.
       rpc :redeemCoupon, ::SingleUseCoupons::Coupon, ::Io::Id
+      # Updates the external ID of an existing coupon. Required fields: coupon id , or externalId, newExternalId and campaignId.
       rpc :updateCouponExternalId, ::SingleUseCoupons::CouponNewExternalIdRequest, ::Io::Id
+      # Streams coupon redemptions for batch processing.
       rpc :streamCouponRedemptions, stream(::SingleUseCoupons::Coupon), stream(::Io::Id)
+      # Retrieves a coupon by its PassKit ID. Required fields: couponId.
       rpc :getCouponById, ::Io::Id, ::SingleUseCoupons::Coupon
+      # Retrieves a coupon using an external ID and campaign ID. Required fields: externalId and couponCampaignId.
       rpc :getCouponByExternalId, ::SingleUseCoupons::ExternalIdRequest, ::SingleUseCoupons::Coupon
+      # Voids a coupon and invalidates it in the customer’s wallet. Required fields: coupon ID, or externalId with offerId and campaignId. This action is irreversible.
       rpc :voidCoupon, ::SingleUseCoupons::Coupon, ::Google::Protobuf::Empty
+      # Voids multiple coupons matching the given filters. All affected passes are invalidated. Required fields: classId, protocol and filters. Use with caution, as this action is irreversible.
+      rpc :bulkVoidCoupons, ::Io::BulkPassActionRequest, ::Google::Protobuf::Empty
+      # Lists all coupons for a campaign using basic pagination. This version uses the legacy request format and is maintained for backward compatibility. New integrations should use the updated listCouponsByCouponCampaign call instead as OR operator is not supported.
       rpc :listCouponsByCouponCampaignDeprecated, ::SingleUseCoupons::ListRequestDeprecated, stream(::SingleUseCoupons::Coupon)
+      # Lists all coupons for a campaign using filters and pagination. Required fields: couponCampaignId.
       rpc :listCouponsByCouponCampaign, ::SingleUseCoupons::ListRequest, stream(::SingleUseCoupons::Coupon)
+      # Counts all coupons for a campaign. This version uses the legacy request format and is maintained for backward compatibility. New integrations should use the updated countCouponsByCouponCampaign call instead as OR operator is not supported.
       rpc :countCouponsByCouponCampaignDeprecated, ::SingleUseCoupons::ListRequestDeprecated, ::Io::Count
+      # Counts all coupons for a campaign using advanced filters. Required fields: couponCampaignId.
       rpc :countCouponsByCouponCampaign, ::SingleUseCoupons::ListRequest, ::Io::Count
+      # Updates the personal information of the coupon holder (e.g., name, email). Required fields: couponId, or externalId + classId.
       rpc :patchPerson, ::Io::PersonRequest, ::Io::Id
+      # Creates a copy of an existing coupon campaign. Required fields: campaignId.
       rpc :copyCouponCampaign, ::SingleUseCoupons::CampaignCopyRequest, ::Io::Id
+      # Retrieves meta keys (custom fields) for a specific campaign. Required fields: campaignId.
       rpc :getMetaKeysForCampaign, ::Io::Id, ::Io::Strings
     end
 

@@ -2,13 +2,14 @@
 # Source: io/event_tickets/a_rpc.proto for package 'event_tickets'
 # Original file comments:
 # *
-# Events Protocol is designed to get your Digital Event Tickets into Apple Wallet and Google Pay, from theatre and cinema, to sport events and concerts.
+# Events Protocol is designed to get your Digital Event Tickets into Apple Wallet and Google Wallet, from theatre and cinema, to sport events and concerts.
 
 require 'grpc'
 require 'io/event_tickets/a_rpc_pb'
 
 module EventTickets
   module EventTickets
+    # Manages event-ticket productions, venues, events, ticket types, tickets, validation, and redemption. Ticket types belong to a production; issued tickets are associated with an event and ticket type.
     class Service
 
       include ::GRPC::GenericService
@@ -17,48 +18,93 @@ module EventTickets
       self.unmarshal_class_method = :decode
       self.service_name = 'event_tickets.EventTickets'
 
+      # Creates a new Production record. Required fields: name.
       rpc :createProduction, ::EventTickets::Production, ::Io::Id
+      # Partially updates an existing Production. Required fields: id and fields to update. Note: changes will update and affect all existing Events & Tickets related to this Production.
       rpc :patchProduction, ::EventTickets::Production, ::EventTickets::Production
+      # Fully updates an existing Production. Required fields: id and all required fields are required. Note: changes will update and affect all existing Events & Tickets related to this Production.
       rpc :updateProduction, ::EventTickets::Production, ::EventTickets::Production
+      # Retrieves a Production by ID. Required fields: id.
       rpc :getProduction, ::Io::Id, ::EventTickets::Production
+      # Deletes a Production and all associated Events and Tickets. Required fields: id. Use with caution, as this action is irreversible.
       rpc :deleteProduction, ::EventTickets::Production, ::Google::Protobuf::Empty
+      # Lists all Productions for the authenticated user. Supports filtering options to narrow down the results based on specific criteria.
       rpc :listProductions, ::Io::Filters, stream(::EventTickets::Production)
+      # Retrieves analytics for a specific Production. Required fields: classId and protocol.
       rpc :getAnalytics, ::Io::AnalyticsRequest, ::EventTickets::ProductionAnalyticsResponse
+      # Creates a copy of an existing Production. Required fields: id.
       rpc :copyProduction, ::EventTickets::ProductionCopyRequest, ::Io::Id
+      # Creates a new Venue record. Required fields: name and address.
       rpc :createVenue, ::EventTickets::Venue, ::Io::Id
+      # Fully updates an existing Venue. Required fields: id and all required fields are required. Note: changes will update and affect all existing Events & Tickets related to this Venue.
       rpc :updateVenue, ::EventTickets::Venue, ::EventTickets::Venue
+      # Partially updates an existing Venue. Required fields: id and fields to update. Note: changes will update and affect all existing Events & Tickets related to this Venue.
       rpc :patchVenue, ::EventTickets::Venue, ::EventTickets::Venue
+      # Retrieves a Venue by ID. Required fields: id.
       rpc :getVenueById, ::Io::Id, ::EventTickets::Venue
+      # Deletes a Venue and all associated Events and Tickets. Required fields: id. Use with caution, as this action is irreversible.
       rpc :deleteVenue, ::EventTickets::Venue, ::Google::Protobuf::Empty
+      # Lists all Venues for the authenticated user. Supports filtering options to narrow down the results based on specific criteria.
       rpc :listVenues, ::Io::Filters, stream(::EventTickets::Venue)
+      # Creates an event for a production at a venue. Required fields: production and venue.
       rpc :createEvent, ::EventTickets::Event, ::Io::Id
+      # Fully updates an existing Event. Required fields: id and all required fields are required. Note: changes will update & affect all existing tickets related to this event. Production and Venue cannot be changed from this endpoint.
       rpc :updateEvent, ::EventTickets::Event, ::EventTickets::Event
+      # Partially updates an existing Event. Required fields: id and fields to update. Note: changes will update & affect all existing tickets related to this event. Production and Venue cannot be changed from this endpoint.
       rpc :patchEvent, ::EventTickets::Event, ::EventTickets::Event
+      # Retrieves an Event by ID. Required fields: id.
       rpc :getEventById, ::Io::Id, ::EventTickets::Event
+      # Retrieves an Event by start date and venue. Required fields: productionId, venueId, startDate.
       rpc :getEventByStartDateAndVenue, ::EventTickets::GetEventRequest, ::EventTickets::Event
+      # Deletes an Event and all associated Tickets. Required fields: id. Use with caution, as this action is irreversible.
       rpc :deleteEvent, ::EventTickets::Event, ::Google::Protobuf::Empty
+      # Lists Events for a Production. Required fields: productionId. Supports filtering options to narrow down the results based on specific criteria.
       rpc :listEvents, ::EventTickets::EventListRequest, stream(::EventTickets::EventListResponse)
+      # Creates a new Ticket Type. Required fields: name, productionId and beforeRedeemPassTemplateId.
       rpc :createTicketType, ::EventTickets::TicketType, ::Io::Id
+      # Fully updates an existing Ticket Type. Required fields: name, productionId, beforeRedeemPassTemplateId and all required fields are required. Note: changes will update & affect all existing Tickets related to this Ticket Type.
       rpc :updateTicketType, ::EventTickets::TicketType, ::EventTickets::TicketType
+      # Partially updates an existing Ticket Type. Required fields: name, productionId, beforeRedeemPassTemplateId fields to update. Note: changes will update & affect all existing Tickets related to this Ticket Type.
       rpc :patchTicketType, ::EventTickets::TicketType, ::EventTickets::TicketType
+      # Retrieves a Ticket Type by ID. Required fields: id.
       rpc :getTicketTypeById, ::Io::Id, ::EventTickets::TicketType
+      # Retrieves a Ticket Type by User Defined ID. Required fields: productionId, uid.
       rpc :getTicketTypeByUserDefinedId, ::EventTickets::GetByUidRequest, ::EventTickets::TicketType
+      # Deletes a Ticket Type and all associated Tickets. Required fields: id, or productionId and uid. Use with caution, as this action is irreversible.
       rpc :deleteTicketType, ::EventTickets::TicketType, ::Google::Protobuf::Empty
+      # Lists all Ticket Types for a Production. Required fields: productionId. Supports filtering options to narrow down the results based on specific criteria.
       rpc :listTicketTypes, ::EventTickets::TicketTypeListRequest, stream(::EventTickets::TicketType)
+      # Issues a ticket using PassKit IDs for its ticket type and event. Required fields: ticketTypeId, eventId, ticketNumber, person.name.
       rpc :issueTicket, ::EventTickets::IssueTicketRequest, ::Io::Id
+      # Issues a new Ticket by User Defined IDs. Required fields: productionUid, venueUid, ticketTypeUid, event.startDate and ticket.ticketNumber.
       rpc :issueTicketById, ::EventTickets::Ticket, ::EventTickets::IssueTicketResponseIds
+      # Updates an existing Ticket. Required fields: id or (ticketNumber + productionId).
       rpc :updateTicket, ::EventTickets::Ticket, ::Io::Id
+      # Updates personal information for a ticket holder. Required fields: ticketId or (ticketNumber + productionId), person.
       rpc :patchPerson, ::EventTickets::EventTicketPerson, ::Io::Id
+      # Validates a ticket without redeeming it. Required fields: id or ticketNumber with productionId.
       rpc :validateTicket, ::EventTickets::ValidateTicketRequest, ::EventTickets::ValidateTicketResponse
+      # Redeems a ticket and records the redemption. Required fields: id or ticketNumber with productionId.
       rpc :redeemTicket, ::EventTickets::RedeemTicketRequest, ::Io::Id
+      # Redeems multiple Tickets by order number. Required fields: productionid or productionUid, and orderNumber.
       rpc :redeemTicketsByOrderNumber, ::EventTickets::RedeemByOrderNumber, ::Io::Ids
+      # Retrieves a Ticket by ID. Required fields: id.
       rpc :getTicketById, ::Io::Id, ::EventTickets::Ticket
+      # Retrieves a Ticket by ticket number. Required fields: productionId and ticketNumber.
       rpc :getTicketByTicketNumber, ::EventTickets::TicketNumberRequest, ::EventTickets::Ticket
+      # Retrieves Tickets by order number. Required fields: productionId and orderNumber.
       rpc :getTicketsByOrderNumber, ::EventTickets::OrderNumberRequest, ::EventTickets::Tickets
+      # Retrieves the digital pass bundle for a ticket. Required fields: ticketId, or productionId with ticketNumber or orderNumber.
       rpc :getEventTicketPass, ::EventTickets::EventTicketPassRequest, ::Io::PassBundles
+      # Deletes a Ticket. Required fields: id or (ticketNumber + productionId).
       rpc :deleteTicket, ::EventTickets::TicketId, ::Google::Protobuf::Empty
+      # Deletes multiple Tickets using a filter. Required fields: classId, protocol and filters.
+      rpc :bulkDeleteTickets, ::Io::BulkPassActionRequest, ::Google::Protobuf::Empty
+      # Deletes Tickets by order number. Required fields: productionId or productionUid and orderNumber.
       rpc :deleteTicketsByOrderNumber, ::EventTickets::OrderNumberRequest, ::Google::Protobuf::Empty
+      # Lists all Tickets for a Production. Required fields: productionId + ticketTypeId + eventId.
       rpc :listTickets, ::EventTickets::TicketListRequest, stream(::EventTickets::TicketLimitedFields)
+      # Counts the number of Tickets matching the filter. Required fields: productionId + ticketTypeId + eventId.
       rpc :countTickets, ::EventTickets::TicketListRequest, ::Io::Count
     end
 

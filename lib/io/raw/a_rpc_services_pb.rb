@@ -3,7 +3,7 @@
 # Original file comments:
 # *
 # This protocol is suit for cases where the business logic is handled elsewhere, and the purpose is purely to issue and
-# update content for Apple Wallet and Google Pay.
+# update content for Apple Wallet and Google Wallet.
 
 require 'grpc'
 require 'io/raw/a_rpc_pb'
@@ -18,18 +18,31 @@ module Raw
       self.unmarshal_class_method = :decode
       self.service_name = 'raw.Raw'
 
+      # Creates a Pass Project. Required Fields: name, protocol, classId.
       rpc :createPassProject, ::Raw::PassProject, ::Io::Id
+      # Updates an existing Pass Project. Required Fields: id, name, protocol, classId.
       rpc :updatePassProject, ::Raw::PassProject, ::Raw::PassProject
+      # Retrieves a Pass Project by ID. Required Fields: id.
       rpc :getPassProject, ::Io::Id, ::Raw::PassProject
+      # Copies an existing Pass Project. Required Fields: id (of the source PassProject).
       rpc :copyPassProject, ::Raw::PassProjectCopyRequest, ::Io::Id
+      # Deletes a Pass Project by ID. Deleting a Pass Project results in all passes being invalidated and removed. Use with caution. Required Fields: id.
       rpc :deletePassProject, ::Io::Id, ::Google::Protobuf::Empty
+      # Creates a new Pass record. Required Fields: passProjectId, externalId, and fields required by protocol template.
       rpc :createPass, ::Raw::Pass, ::Io::Id
+      # Updates an existing Pass record. Required Fields: id.
       rpc :updatePass, ::Raw::Pass, ::Io::Id
+      # Streams multiple Pass updates via gRPC (not available via REST). Required Fields: id for each Pass.
       rpc :streamPassUpdates, stream(::Raw::Pass), stream(::Io::Id)
+      # Retrieves a Pass by its internal ID. Required Fields: id.
       rpc :getPassById, ::Io::Id, ::Raw::Pass
+      # Retrieves a Pass by its external ID and Pass Project ID. Required Fields: passProjectId, externalId.
       rpc :getPassByExternalId, ::Raw::PassRecordByExternalIdRequest, ::Raw::Pass
+      # Deletes a Pass record. Required Fields: id.
       rpc :deletePass, ::Raw::Pass, ::Google::Protobuf::Empty
+      # Lists all passes for a Pass Project. Supports pagination. Required Fields: passProjectId.
       rpc :listPassesByPassProject, ::Raw::ListPassesByPassProjectRequest, stream(::Raw::Pass)
+      # Lists all passes for a Pass Template. Supports pagination. Required Fields: passTemplateId.
       rpc :listPassesByPassTemplate, ::Raw::ListPassesByPassTemplateRequest, stream(::Raw::Pass)
     end
 

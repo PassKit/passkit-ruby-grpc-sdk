@@ -4,13 +4,14 @@
 # *
 # Members RPC
 #
-# The PassKit Members API lets you manage your membership programs and passes for Apple Wallet and Google Pay.
+# The PassKit Members API lets you manage your membership programs and passes for Apple Wallet and Google Wallet.
 
 require 'grpc'
 require 'io/member/a_rpc_pb'
 
 module Members
   module Members
+    # Manages membership programmes, tiers, members, member events, pass lifecycle, and point balances. Create a programme before creating tiers or enrolling members.
     class Service
 
       include ::GRPC::GenericService
@@ -19,67 +20,98 @@ module Members
       self.unmarshal_class_method = :decode
       self.service_name = 'members.Members'
 
-      # Create a program record. Allows a user to specify program details around enrolment, renewal and cancellation processes. Optionally allows the user to set the GPS location / Beacons that will trigger a lock-screen alert.
+      # Creates a new membership program with details about enrollment, renewal, and cancellation. Optionally configure GPS locations and Beacons to trigger lock-screen notifications. Required fields: program name.
       rpc :createProgram, ::Members::Program, ::Io::Id
-      # Updates an existing program record.
+      # Updates an existing membership program with new details or settings. Required fields: program id.
       rpc :updateProgram, ::Members::Program, ::Members::Program
-      # Gets an existing program record by id.
+      # Retrieves a membership program by its unique id. Required fields: program id.
       rpc :getProgram, ::Io::Id, ::Members::Program
-      # Copies an existing program record to a new record, and allows for status of new program to be set; i.e. copy a draft to published (production) program. Will copy program AND related tier + template records.
+      # Creates a new program by copying the configuration and design of an existing program. Required fields: source program id.
       rpc :copyProgram, ::Members::ProgramCopyRequest, ::Io::Id
-      # Deletes an existing program record by id. Deleting a program results in all tiers, and members underneath it being invalidated and removed. Needs to be used with care.
+      # Permanently deletes a membership program and its associated data, including all passes. Required fields: program id. Use with caution, as this action is irreversible.
       rpc :deleteProgram, ::Io::Id, ::Google::Protobuf::Empty
-      # Lists all programs for the logged in user.
+      # Lists all membership programs associated with your project. Supports filtering and pagination. This version uses the legacy request format and is maintained for backward compatibility. New integrations should use the updated listPrograms call instead.
       rpc :listProgramsDeprecated, ::Io::Pagination, stream(::Members::Program)
-      # Lists all programs for the logged in user.
+      # Lists all membership programs associated with your project. Supports filtering options to narrow down the results based on specific criteria.
       rpc :listPrograms, ::Io::Filters, stream(::Members::Program)
-      # Create a new tier in an existing member program. Tiers allow a user to categorize their membership program; tiers allow for additional detail that is specific to that 'group' of members. A program needs at least one tier.
+      # Creates a new membership tier within a program, specifying criteria, benefits, and settings. Required fields: program id, tier name.
       rpc :createTier, ::Members::Tier, ::Io::Id
-      # Updates a tier by tier id
+      # Updates an existing membership tier’s details such as benefits, qualifications, and rules. Required fields: tier id.
       rpc :updateTier, ::Members::Tier, ::Members::Tier
-      # Gets a tier by tier ID
+      # Retrieves details of a specific membership tier by its id. Required fields: tier id.
       rpc :getTier, ::Members::TierRequestInput, ::Members::Tier
-      # Deletes a tier. Deleting a tier will invalidate and delete all the passes that are in the tier.
+      # Deletes a membership tier from a program. Required fields: tier id.
       rpc :deleteTier, ::Members::TierRequestInput, ::Google::Protobuf::Empty
-      # Lists all the tiers.
+      # Retrieves a list of all membership tiers within a membership program. Required fields: program id. This version uses the legacy request format and is maintained for backward compatibility. New integrations should use listTiers.
       rpc :listTiersDeprecated, ::Members::ListRequestDeprecated, stream(::Members::Tier)
-      # Lists all the tiers.
+      # Retrieves a list of all membership tiers within a membership program. Required fields: program id. Supports filtering options to narrow down the results based on specific criteria.
       rpc :listTiers, ::Members::ListRequest, stream(::Members::Tier)
-      # Enrols a new member into a tier of a program. Returns the PassKit Member ID.
+      # Enrols a member in a programme and creates their pass record. The request must identify the target programme and member data.
       rpc :enrolMember, ::Members::Member, ::Io::Id
-      # Enrols a new member into the default tier (lowest tier index) of a program. Returns the PassKit Member ID.
+      # Enrols a member through the public, unauthenticated enrolment endpoint. The request must identify the target programme and member data.
       rpc :enrolMemberPublic, ::Members::Member, ::Io::Id
+      # Retrieves a member record using the PassKit id. Required fields: member id.
       rpc :getMemberRecordById, ::Io::Id, ::Members::Member
+      # Retrieves a member record using the member's external id. Required fields: program id and external id.
       rpc :getMemberRecordByExternalId, ::Members::MemberRecordByExternalIdRequest, ::Members::Member
+      # Checks in a member in by PassKit Id or External Id. Required fields: member id or program id and external id.
       rpc :checkInMember, ::Members::MemberCheckInOutRequest, ::Members::MemberEvent
+      # Checks out a member in by PassKit Id or External Id. Required fields: member id or program id and external id.
       rpc :checkOutMember, ::Members::MemberCheckInOutRequest, ::Members::MemberEvent
+      # Retrieves a list of all members within a membership program. Required fields: program id. This version uses the legacy request format and is maintained for backward compatibility. New integrations should use listMembers as OR operator is not supported.
       rpc :listMembersDeprecated, ::Members::ListRequestDeprecated, stream(::Members::Member)
+      # Retrieves a list of all members within a membership program. Required fields: program id. Supports filtering options to narrow down the results based on specific criteria.
       rpc :listMembers, ::Members::ListRequest, stream(::Members::Member)
+      # Updates a member record by PassKit ID or external ID. Use patchPerson when changing personal information only.
       rpc :updateMember, ::Members::Member, ::Io::Id
-      # @todo: define callback
+      # Adds (earns) loyalty points to a member's account using PassKit Id or External Id. Required fields: member id, or program id and external id, and number of points to earn.
       rpc :earnPoints, ::Members::EarnBurnPointsRequest, ::Members::MemberPoints
-      # @todo: define callback
+      # Removes (burns) loyalty points to a member's account using PassKit Id or External Id. Required fields: member id, or program id and external id, and number of points to burn.
       rpc :burnPoints, ::Members::EarnBurnPointsRequest, ::Members::MemberPoints
+      # Sets loyalty points balance to a specific value for a member using PassKit Id or External Id. Required fields: member id, or program id and external id, and new points balance.
       rpc :setPoints, ::Members::SetPointsRequest, ::Members::MemberPoints
+      # Changes a member’s tier within a program using PassKit Id or External Id. Required fields: member id, or program id and external id, and new tier id.
       rpc :changeMemberTier, ::Members::ChangeTierRequest, ::Members::MemberEvent
+      # Updates multiple members based on filtering criteria. This version uses the legacy request format and is maintained for backward compatibility. New integrations should use bulkUpdateMembers.
       rpc :updateMembersBySegment, ::Members::MemberSegmentRequest, ::Google::Protobuf::Empty
+      # Deletes multiple members based on filtering criteria. This version uses the legacy request format and is maintained for backward compatibility. New integrations should use bulkDeleteMembers.
       rpc :deleteMembersBySegment, ::Members::MemberSegmentRequest, ::Google::Protobuf::Empty
+      # Deletes a single member by their PassKit Id or External ID. Required fields: member id or program id and external id.
       rpc :deleteMember, ::Members::Member, ::Google::Protobuf::Empty
+      # Bulk deletes multiple members from a program based on provided criteria. Required fields: program id, protocol and filters criteria.
+      rpc :bulkDeleteMembers, ::Io::BulkPassActionRequest, ::Google::Protobuf::Empty
+      # Counts the number of members matching a filter. Required fields: program id. This version uses the legacy request format and is maintained for backward compatibility. New integrations should use countMembers as OR operator is not supported.
       rpc :countMembersDeprecated, ::Members::ListRequestDeprecated, ::Io::Count
+      # Counts the number of members matching a filter. Required fields: program id.
       rpc :countMembers, ::Members::ListRequest, ::Io::Count
+      # [UNIMPLEMENTED] Retrieves the message history sent to a member. Required fields: member id.
       rpc :getMessageHistoryForMember, ::Io::Pagination, stream(::Io::Message)
+      # Retrieves meta keys (custom fields) for a specific program. Required fields: program id.
       rpc :getMetaKeysForProgram, ::Io::Id, ::Io::Strings
+      # Batch updates the expiry dates for ALL members. Required fields: program id, tier id and new expiry settings.
       rpc :renewMembersExpiry, ::Members::UpdateExpiryRequest, ::Io::Count
+      # Updates the expiry date for a member’s pass using the PassKit Id or External Id. Required fields: member id, or external id and program id, and new expiry date.
       rpc :updateMemberExpiry, ::Members::MemberExpiry, ::Io::Id
+      # Updates a member's personal information, such as name, address, or contact details. Required fields: member id, or external id and program id, and new member information.
       rpc :patchPerson, ::Io::PersonRequest, ::Io::Id
+      # Counts the number of member events for a specific program based on given filters. Required fields: program id.
       rpc :countMemberEvents, ::Members::ListRequest, ::Io::Count
+      # Lists events related to members in a specific program, supporting filtering and pagination. Required fields: program id.
       rpc :listMemberEvents, ::Members::ListRequest, stream(::Members::MemberEvent)
+      # Retrieves the list of meta keys associated with member events for a specific program. Required fields: program id.
       rpc :getMemberEventMetaKeysForProgram, ::Io::Id, ::Io::Strings
+      # Lists events for a specific member, such as check-ins/outs, changes to points etc. Required fields: member id.
       rpc :listEventsForMember, ::Io::Id, stream(::Members::MemberEvent)
+      # Deletes member event history for a program based on specified criteria. Required fields: program id.
       rpc :deleteMemberEvents, ::Members::ListRequest, ::Google::Protobuf::Empty
+      # Deletes all member events associated with a specific member. Required fields: member id.
       rpc :deleteEventsForMember, ::Io::Id, ::Google::Protobuf::Empty
+      # Deletes a specific individual member event. Required fields: member event id.
       rpc :deleteMemberEvent, ::Io::Id, ::Google::Protobuf::Empty
+      # Retrieves enrolment URLs and QR codes for a membership program, including tier-specific links if applicable. Required fields: program id.
       rpc :getProgramEnrolment, ::Io::Id, ::Io::EnrolmentUrls
+      # Applies the supplied field updates to members selected by the request filters. Required fields: classId, filterGroups, updateEntries.
+      rpc :batchUpdate, ::Io::BatchUpdateRequest, ::Google::Protobuf::Empty
     end
 
     Stub = Service.rpc_stub_class

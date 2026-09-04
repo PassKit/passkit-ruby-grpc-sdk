@@ -14,10 +14,15 @@ module Io
       self.unmarshal_class_method = :decode
       self.service_name = 'io.Messages'
 
+      # Retrieves a single message by its ID. Required Fields: id.
       rpc :getMessage, ::Io::Id, ::Io::Message
+      # Creates a new message that can be linked to a pass or class. Required Fields: id.
       rpc :createMessage, ::Io::Message, ::Io::Id
+      # Updates an existing message by ID. Required Fields: id.
       rpc :updateMessage, ::Io::Message, ::Google::Protobuf::Empty
+      # Deletes a message by its ID. Required Fields: id. Note: Deleting a message removes it from all linked passes.
       rpc :deleteMessage, ::Io::Id, ::Google::Protobuf::Empty
+      # Sends a message to specified pass IDs or to all passes in a class. Required: passId, protocol.
       rpc :sendMessage, ::Io::SendMessageRequest, ::Io::SendMessageResponse
     end
 

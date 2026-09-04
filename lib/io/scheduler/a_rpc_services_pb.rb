@@ -11,6 +11,7 @@ require 'io/scheduler/a_rpc_pb'
 
 module Scheduler
   module Scheduler
+    # The PassKit Scheduler API allows you to automate tasks within your PassKit programs. This API allows you to schedule one-time or recurring jobs that interact with other PassKit APIs.
     class Service
 
       include ::GRPC::GenericService
@@ -19,12 +20,19 @@ module Scheduler
       self.unmarshal_class_method = :decode
       self.service_name = 'scheduler.Scheduler'
 
+      # Creates a scheduling job. Required Fields: scheduleType, protocol, classId, jobName, scheduledTime, timezone.
       rpc :createSchedulingJob, ::Ct::SchedulingJob, ::Ct::SchedulingJobResponse
+      # Retrieves a scheduling job by its ID. If the job has been deleted, only history logs will be returned. Required Fields: id.
       rpc :getSchedulingJob, ::Io::Id, ::Ct::SchedulingJob
+      # Updates an existing scheduling job. The full SchedulingJob object must be supplied. Empty/null fields will overwrite existing data. Required Fields: id, scheduleType, protocol, classId, jobName, scheduledTime, timezone.
       rpc :updateSchedulingJob, ::Ct::SchedulingJob, ::Ct::SchedulingJobResponse
+      # Patch updates a scheduling job. Only supplied fields will be updated. Required Fields: id.
       rpc :patchSchedulingJob, ::Ct::SchedulingJob, ::Ct::SchedulingJobResponse
+      # Deletes a scheduling job by ID. History logs remain available after deletion. Required Fields: id.
       rpc :deleteSchedulingJob, ::Io::Id, ::Google::Protobuf::Empty
+      # Retrieves a specific scheduling job history log by ID. Required Fields: id.
       rpc :getSchedulingJobHistory, ::Io::Id, ::Ct::JobHistory
+      # Lists all history logs for a given scheduling job. Required Fields: jobId.
       rpc :listSchedulingJobHistories, ::Scheduler::ListRequest, stream(::Ct::JobHistory)
     end
 

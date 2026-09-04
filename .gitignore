@@ -1,0 +1,7 @@
+.DS_Store
+.vscode/
+*.gem
+
+# Temporary generated output before files are copied into lib/.
+/ct/
+/io/

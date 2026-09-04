@@ -4,13 +4,14 @@
 # *
 # Flights RPC
 #
-# The PassKit Flights API lets you manage your flights and boarding passes for Apple Wallet and Google Pay.
+# The PassKit Flights API lets you manage your flights and boarding passes for Apple Wallet and Google Wallet.
 
 require 'grpc'
 require 'io/flights/a_rpc_pb'
 
 module Flights
   module Flights
+    # Manages carriers, flight designators, flights, and digital boarding passes. Carrier and flight-designator records provide data used when creating flights and boarding passes.
     class Service
 
       include ::GRPC::GenericService
@@ -19,47 +20,47 @@ module Flights
       self.unmarshal_class_method = :decode
       self.service_name = 'flights.Flights'
 
-      # Create an airport record. Optional method allowing the carrier to specify how the airport name is rendered in the pass and the GPS location that will trigger a lock-screen alert.
+      # Create an airport record. Optional method allowing the carrier to specify how the airport name is rendered in the pass and the GPS location that will trigger a lock-screen alert. Required Fields: airportCode, cityName, airportName, countryCode, timezone.
       rpc :createPort, ::Flights::Port, ::Google::Protobuf::Empty
-      # Retrieve an airport record. The AirportCode is the three character IATA code or 4 character ICAO code.
+      # Retrieve an airport record. The AirportCode is the three character IATA code or 4 character ICAO code. Required Fields: airportCode.
       rpc :getPort, ::Flights::AirportCode, ::Flights::Port
-      # Update an airport record.
+      # Update an airport record. Required Fields: airportCode.
       rpc :updatePort, ::Flights::Port, ::Flights::Port
-      # Delete an airport record. Deleting a record will remove any custom data provided. A new Airport record may be automatically created for a flight departing, arriving or transiting an airport which does not have a record, using publicly available data.
+      # Delete an airport record. Deleting a record will remove any custom data provided. A new Airport record may be automatically created for a flight departing, arriving or transiting an airport which does not have a record, using publicly available data. Required Fields: airportCode.
       rpc :deletePort, ::Flights::AirportCode, ::Google::Protobuf::Empty
-      # Create a carrier record. All Flight Designations and Flights must have a carrier record.
+      # Create a carrier record. All Flight Designators and Flights must have a carrier record. Required Fields: carrierCode, airlineName, passTypeIdentifier.
       rpc :createCarrier, ::Flights::Carrier, ::Google::Protobuf::Empty
-      # Retrieve a carrier record.
+      # Retrieve a carrier record. Required Fields: carrierCode.
       rpc :getCarrier, ::Flights::CarrierCode, ::Flights::Carrier
-      # Update a carrier record
+      # Update a carrier record. Required Fields: carrierCode.
       rpc :updateCarrier, ::Flights::Carrier, ::Flights::Carrier
-      # Delete a carrier record.
+      # Delete a carrier record. Required Fields: carrierCode.
       rpc :deleteCarrier, ::Flights::CarrierCode, ::Google::Protobuf::Empty
-      # Create a flight designator record. As much default information as possible should be provided to facilitate the automatic generation of flight records.
+      # Create a flight designator record. As much default information as possible should be provided to facilitate the automatic generation of flight records. Required Fields: carrierCode, flightNumber, revision, schedule, origin, destination.
       rpc :createFlightDesignator, ::Flights::FlightDesignator, ::Google::Protobuf::Empty
-      # Retrieve a flight designation record.
+      # Retrieve a flight designator record. Required Fields: carrierCode, flightNumber, revision.
       rpc :getFlightDesignator, ::Flights::FlightDesignatorRequest, ::Flights::FlightDesignator
-      # Update a flight designation record.
+      # Update a flight designator record. Required Fields: carrierCode, flightNumber, revision.
       rpc :updateFlightDesignator, ::Flights::FlightDesignator, ::Flights::FlightDesignator
-      # Delete a flight designation record.
+      # Delete a flight designator record. Required Fields: carrierCode, flightNumber, revision.
       rpc :deleteFlightDesignator, ::Flights::FlightDesignatorRequest, ::Google::Protobuf::Empty
-      # Create a flight record. In practice, this method is not often used, since flight records can be automatically generated. Any information in the flight record will override information in the carrier and flight designation records.
+      # Creates a flight record. Flight records can be generated automatically; values on this record override carrier and flight-designator data. Required fields: carrierCode, flightNumber, departureDate, boardingPoint, deplaningPoint.
       rpc :createFlight, ::Flights::Flight, ::Google::Protobuf::Empty
-      # Retrieve a flight record.
+      # Retrieve a flight record. Required Fields: carrierCode, flightNumber, departureDate, boardingPoint, deplaningPoint.
       rpc :getFlight, ::Flights::FlightRequest, ::Flights::Flight
-      # Update a flight record.
+      # Update a flight record. Required Fields: carrierCode, flightNumber, departureDate, boardingPoint, deplaningPoint.
       rpc :updateFlight, ::Flights::Flight, ::Flights::Flight
-      # Delete a flight record.
+      # Delete a flight record. Required Fields: carrierCode, flightNumber, departureDate, boardingPoint, deplaningPoint.
       rpc :deleteFlight, ::Flights::FlightRequest, ::Google::Protobuf::Empty
-      # Create a boarding pass record. Flight related information not present in the boarding pass record will be populated from the flight, flight designator or carrier records.
+      # Creates a boarding-pass record. Missing flight data is populated from the related flight, flight designator, or carrier records. Required fields: operatingCarrierPNR, boardingPoint, deplaningPoint, carrierCode, flightNumber, departureDate, passenger, sequenceNumber.
       rpc :createBoardingPass, ::Flights::BoardingPassRecord, ::Flights::BoardingPassesResponse
-      # Retrieve a boarding pass record.
+      # Retrieve a boarding pass record. Required Fields: ticketNumber or index or passId.
       rpc :getBoardingPassRecord, ::Flights::BoardingPassRecordRequest, ::Flights::BoardingPassRecord
-      # Retrieve digital boarding pass(es) in the requested format by ticket number, index, PNR or id.
+      # Retrieves digital boarding passes in the requested format by ticket number, index, PNR, or pass ID. Required fields: ticketNumber, index, or passId.
       rpc :getBoardingPass, ::Flights::BoardingPassRequest, ::Flights::BoardingPassesResponse
-      # Update a boarding pass record.
+      # Update a boarding pass record. Required Fields: operatingCarrierPNR, boardingPoint, deplaningPoint, carrierCode, flightNumber, departureDate, passenger, sequenceNumber.
       rpc :updateBoardingPass, ::Flights::BoardingPassRecord, ::Flights::BoardingPassRecord
-      # Delete a boarding pass record.
+      # Delete a boarding pass record. Required Fields: ticketNumber or index or passId
       rpc :deleteBoardingPass, ::Flights::BoardingPassRecordRequest, ::Google::Protobuf::Empty
     end
 

@@ -14,44 +14,81 @@ module Io
       self.unmarshal_class_method = :decode
       self.service_name = 'io.Users'
 
+      # Creates a user and issues a verification email. Required Fields: email, password, name, companyName.
       rpc :createUser, ::Io::NewUser, ::Io::NewUserResponse
+      # Creates a new user and returns a JWT token. Required Fields: email, password, name, companyName.
       rpc :newUser, ::Io::NewUser, ::Io::JWT
+      # Verifies the user with the email verification code. Required Fields: code.
       rpc :verify, ::Io::VerifyRequest, ::Io::Boolean
+      # Resends the verification email.
       rpc :resendVerificationEmail, ::Google::Protobuf::Empty, ::Io::Boolean
+      # Retrieves the authenticated user's profile.
       rpc :getUser, ::Google::Protobuf::Empty, ::Io::GetUserResponse
+      # Authenticates the user and returns a JWT token. Required Fields: username, password.
       rpc :login, ::Io::Credentials, ::Io::JWT
+      # Returns the barcode image URL for 2FA setup.
       rpc :get2faBarcode, ::Google::Protobuf::Empty, ::Io::Url
+      # Resets the user's password if a reset code is already obtained. Required Fields: username, password, code.
       rpc :resetPassword, ::Io::Credentials, ::Google::Protobuf::Empty
+      # Sends a password reset link to the user's email. Required Fields: username.
       rpc :sendPasswordResetLink, ::Io::Username, ::Google::Protobuf::Empty
+      # Changes the user's password using a reset token. Required Fields: token, password.
       rpc :changePassword, ::Io::PasswordResetInput, ::Google::Protobuf::Empty
+      # Changes the currently authenticated user's password. Requires a valid auth token and the current password. Required Fields: currentPassword, newPassword, confirmNewPassword.
+      rpc :changeOwnPassword, ::Io::ChangeOwnPasswordInput, ::Io::JWT
+      # Initiates email change. Verification email is sent to new address. Required Fields: email.
       rpc :changeEmail, ::Io::Email, ::Google::Protobuf::Empty
+      # Confirms and finalizes the email change. Required Fields: email, code.
       rpc :confirmEmailChange, ::Io::ConfirmEmailChangeInput, ::Google::Protobuf::Empty
+      # Updates the company name associated with the account. Required Fields: name.
       rpc :updateCompanyName, ::Io::CompanyName, ::Google::Protobuf::Empty
+      # [DEPRECATED] Retrieves user’s projects using pagination. Required Fields: pagination.
       rpc :getProjectsForUserQueryDeprecated, ::Io::Pagination, stream(::Io::Project)
+      # [DEPRECATED] Retrieves all company projects using pagination. Required Fields: pagination.
       rpc :getProjectsQueryDeprecated, ::Io::Pagination, stream(::Io::Project)
+      # Retrieves user’s projects using filters. Required Fields: filters.
       rpc :getProjectsForUserQuery, ::Io::Filters, stream(::Io::Project)
+      # Retrieves all company projects using filters. Required Fields: filters.
       rpc :getProjectsQuery, ::Io::Filters, stream(::Io::Project)
+      # Retrieves a project by its UUID. Required Fields: id.
       rpc :getProjectByUuid, ::Io::Id, ::Io::Project
+      # Retrieves a project and template using short code. Required Fields: id.
       rpc :getProjectAndTemplateByShortCode, ::Io::Id, ::Io::ProjectByShortCodeResult
+      # Retrieves projects belonging to a user by status. Required Fields: status.
       rpc :getProjectsForUser, ::Io::ProjectStatusFilter, stream(::Io::Project)
+      # Retrieves all company projects by status. Required Fields: status.
       rpc :getProjects, ::Io::ProjectStatusFilter, stream(::Io::Project)
+      # Retrieves the scanner configuration for the user.
       rpc :getScannerConfig, ::Google::Protobuf::Empty, ::Io::ScannerConfiguration
+      # Creates a new scanner configuration. Required Fields: ScannerConfiguration fields.
       rpc :createScannerConfig, ::Io::ScannerConfiguration, ::Google::Protobuf::Empty
+      # Updates the existing scanner configuration. Required Fields: ScannerConfiguration fields.
       rpc :updateScannerConfig, ::Io::ScannerConfiguration, ::Io::ScannerConfiguration
       # Creates a new oauth2 resource, the returned id is NOT the access token used to make requests on the users behalf.
       rpc :createAuthorizationResource, ::Io::OAuth2AuthorizationRequest, ::Io::Id
+      # Deletes an OAuth2 authorization resource. Required Fields: id.
       rpc :deleteAuthorizationResource, ::Io::Id, ::Google::Protobuf::Empty
+      # Refreshes the API secret key for the current user.
       rpc :refreshApiSecret, ::Google::Protobuf::Empty, ::Google::Protobuf::Empty
+      # Permanently deletes the user's account and all associated data. Required Fields: password.
       rpc :deleteAccount, ::Io::DeleteAccountRequest, ::Google::Protobuf::Empty
+      # Immediately revokes any old gRPC credentials.
       rpc :revokeLegacyCredentials, ::Google::Protobuf::Empty, ::Google::Protobuf::Empty
-      # Team Members
+      # Creates a new sub-user account for the company. Required Fields: email, name, password.
       rpc :createTeamMember, ::Io::NewTeamMember, ::Io::Id
+      # Assigns permissions to a new team member. Required Fields: userId, permissions.
       rpc :createPermissionsForTeamMember, ::Io::TeamMemberPermissions, ::Io::Id
+      # Updates the entire permissions object for a team member. Required Fields: userId, permissions.
       rpc :updateTeamMemberPermissions, ::Io::TeamMemberPermissions, ::Io::TeamMemberPermissions
+      # Updates partial permissions for a team member. Required Fields: userId, permissions.
       rpc :patchTeamMemberPermissions, ::Io::TeamMemberPermissions, ::Io::TeamMemberPermissions
+      # Retrieves a team member by ID. Required Fields: id.
       rpc :getTeamMember, ::Io::Id, ::Io::GetTeamMemberResponse
+      # Retrieves all team members.
       rpc :getTeamMembers, ::Google::Protobuf::Empty, stream(::Io::ListTeamMembersResponse)
+      # Deletes a team member. Required Fields: id.
       rpc :deleteTeamMember, ::Io::Id, ::Google::Protobuf::Empty
+      # Retrieves access logs for a company or user. Required Fields: protocol, classId, userId, dateRange.
       rpc :getTeamMemberLogs, ::Io::AuditLogRequest, stream(::Io::AuditLog)
     end
 
@@ -66,17 +103,29 @@ module Io
       self.unmarshal_class_method = :decode
       self.service_name = 'io.Integrations'
 
+      # Creates integration configurations for a pass type. Required Fields: protocol, classId, integrations.
       rpc :createIntegrations, ::Io::IntegrationConfigs, ::Io::Id
+      # Retrieves integration configurations for a protocol and class. Required Fields: protocol, classId.
       rpc :getIntegrations, ::Io::ProtocolIdInput, ::Io::IntegrationConfigs
+      # Updates integration configurations for a pass type. Required Fields: protocol, classId, integrations.
       rpc :updateIntegrations, ::Io::IntegrationConfigs, ::Io::Id
+      # Deletes integration configurations for a protocol and class. Required Fields: protocol, classId.
       rpc :deleteIntegrations, ::Io::ProtocolIdInput, ::Google::Protobuf::Empty
+      # Creates a sink subscription to receive webhook callbacks after specific events. Required Fields: protocol, classId, event, url.
       rpc :createSinkSubscription, ::Io::SinkSubscription, ::Io::Id
+      # Retrieves a sink subscription configuration. Required Fields: protocol, subscriptionId.
       rpc :getSinkSubscription, ::Io::SubscriptionRequest, ::Io::SinkSubscription
+      # [DEPRECATED] Lists sink subscriptions by segment with optional pagination. Required Fields: pagination.
       rpc :listSinkSubscriptionsDeprecated, ::Io::ListRequestDeprecated, stream(::Io::SinkSubscription)
+      # Lists all sink subscriptions by segment with optional pagination. Required Fields: filters.
       rpc :listSinkSubscriptions, ::Io::ListRequest, stream(::Io::SinkSubscription)
+      # Updates a sink subscription configuration. Required Fields: protocol, classId, event, url.
       rpc :updateSinkSubscription, ::Io::SinkSubscription, ::Io::Id
+      # Deletes a sink subscription configuration. Required Fields: protocol, subscriptionId.
       rpc :deleteSinkSubscription, ::Io::SubscriptionRequest, ::Google::Protobuf::Empty
+      # Returns a sample sink subscription payload. Required Fields: id.
       rpc :getSampleSubscriptionEvent, ::Io::Id, ::Io::SinkSubscription
+      # Dynamically calls an external API using configured credentials. Required Fields: url, method, headers, body (depending on the API).
       rpc :callDynamicApi, ::Io::DynamicApiInput, ::Io::DynamicApiResponse
     end
 

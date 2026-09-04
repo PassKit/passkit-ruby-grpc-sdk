@@ -6,6 +6,7 @@ require 'io/core/a_rpc_certificates_pb'
 
 module Io
   module Certificates
+    # Manage your Apple Wallet Pass Type Identifiers & Certificates
     class Service
 
       include ::GRPC::GenericService
@@ -14,14 +15,33 @@ module Io
       self.unmarshal_class_method = :decode
       self.service_name = 'io.Certificates'
 
+      # Retrieves the Apple pass certificate data for the provided Pass Type Identifier. Required Fields: passTypeId.
       rpc :getAppleCertificateData, ::Io::PassTypeIdentifier, ::Io::CertificateData
+      # Retrieves a Certificate Signing Request (CSR) for the logged-in user. This is used to generate a new certificate on the Apple Developer portal.
       rpc :getCertificateSigningRequest, ::Google::Protobuf::Empty, ::Io::CertificateSigningRequest
+      # Uploads a new Apple certificate for use with Wallet passes. Required Field: fileBytes.
       rpc :addAppleCertificate, ::Io::FileBytes, ::Io::CertificateData
+      # Updates or renews an existing Apple certificate by uploading a new one. Required Fields: fileBytes.
       rpc :updateAppleCertificate, ::Io::FileBytes, ::Io::CertificateData
+      # [DEPRECATED] Returns a paginated list of Apple pass certificates for the current user. Required Fields: pagination fields.
       rpc :listAppleCertificatesDeprecated, ::Io::Pagination, stream(::Io::CertificateData)
+      # Returns a filtered list of Apple pass certificates for the current user. Required Fields: Filters.
       rpc :listAppleCertificates, ::Io::Filters, stream(::Io::CertificateData)
+      # [DEPRECATED] Returns the count of Apple certificates for the current user based on pagination criteria. Required fields: pagination fields.
       rpc :countAppleCertificatesDeprecated, ::Io::Pagination, ::Io::Count
+      # Returns the count of Apple certificates for the current user using filter criteria. Required Fields: Filters (can be empty, but must be present)
       rpc :countAppleCertificates, ::Io::Filters, ::Io::Count
+      # Creates an Apple certificate renewal authority for the authenticated user.
+      rpc :createAppleCertificateRenewalAuthority, ::Io::CreateAppleCertificateRenewalAuthorityRequest, ::Io::AppleCertificateRenewalAuthority
+      # Retrieves an Apple certificate renewal authority by ID.
+      rpc :getAppleCertificateRenewalAuthority, ::Io::GetAppleCertificateRenewalAuthorityRequest, ::Io::AppleCertificateRenewalAuthority
+      # Updates an Apple certificate renewal authority.
+      rpc :updateAppleCertificateRenewalAuthority, ::Io::UpdateAppleCertificateRenewalAuthorityRequest, ::Io::AppleCertificateRenewalAuthority
+      # Deletes an Apple certificate renewal authority.
+      rpc :deleteAppleCertificateRenewalAuthority, ::Io::GetAppleCertificateRenewalAuthorityRequest, ::Io::DeleteAppleCertificateRenewalAuthorityResponse
+      # Lists Apple certificate renewal authorities visible to the authenticated user.
+      rpc :listAppleCertificateRenewalAuthorities, ::Io::ListAppleCertificateRenewalAuthoritiesRequest, stream(::Io::AppleCertificateRenewalAuthority)
+      # Sends NFC signing credentials for an NFC-enabled Apple certificate to the user's registered email address. Required Fields: certificateId, user email must be associated with the cert.
       rpc :sendNFCSigningCredentials, ::Io::NFCSigningCredentialsRequest, ::Google::Protobuf::Empty
     end
 

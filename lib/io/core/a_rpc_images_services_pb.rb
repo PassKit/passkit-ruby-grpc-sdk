@@ -6,6 +6,7 @@ require 'io/core/a_rpc_images_pb'
 
 module Io
   module Images
+    # The PassKit Images API lets you manage your image assets for Apple Wallet, Google Wallet and the data collection pages.
     class Service
 
       include ::GRPC::GenericService
@@ -14,29 +15,51 @@ module Io
       self.unmarshal_class_method = :decode
       self.service_name = 'io.Images'
 
+      # Set the profile image for the logged in user. Required Fields: imageData.
       rpc :setProfileImage, ::Io::ProfileImageInput, ::Google::Protobuf::Empty
+      # Get the profile image URL for the logged in user.
       rpc :getProfileImage, ::Google::Protobuf::Empty, ::Io::Url
+      # Creates one or more images. Image data is provided in base64. Required Fields: name, imageData.
       rpc :createImages, ::Io::CreateImageInput, ::Io::ImageIds
+      # Updates an image record's metadata. Required Fields: id.
       rpc :updateImage, ::Io::UpdateImageInput, ::Io::ImageRecord
+      # Retrieves an image URL by its ID. Required Fields: id.
       rpc :getImageURL, ::Io::Id, ::Io::Url
+      # Retrieves a stamp image URL with the supplied stamp status. Required Fields: id and status.
       rpc :getStampImageURL, ::Io::StampImageRequest, ::Io::Url
+      # Retrieves the configuration of a stamp image. Required Fields: id.
       rpc :getStampImageConfig, ::Io::Id, ::Io::StampImageConfig
+      # Updates a stamp image configuration. Required Fields: id and config fields.
       rpc :updateStampImageConfig, ::Io::StampImageConfig, ::Io::Id
+      # Gets a preview image of the provided stamp image configuration. Required Fields: stampImageConfig and status.
       rpc :getStampImagePreview, ::Io::StampImagePreviewRequest, ::Io::StampImagePreview
+      # Retrieves a localized image URL for a specific language. Required Fields: iD and languageCode.
       rpc :getLocalizedImageURL, ::Io::LocalizedImageInput, ::Io::Url
+      # Retrieves a profile image URL by a specific ID. Required Fields: id.
       rpc :getProfileImageById, ::Io::Id, ::Io::Url
-      # returns a zip bundle containing all images for that ID
+      # Retrieves an image bundle (ZIP) containing all images for the given ID. Required Fields: id.
       rpc :getImageBundle, ::Io::Id, ::Io::ImageBundle
+      # Retrieves metadata for an image record. Required: id.
       rpc :getImageData, ::Io::Id, ::Io::ImageRecord
+      # Deletes an image record. Required: id.
       rpc :deleteImage, ::Io::Id, ::Google::Protobuf::Empty
+      # Deletes a localized version of an image. Required Fields: id and language code.
       rpc :deleteLocalizedImage, ::Io::LocalizedImageInput, ::Io::ImageRecord
+      # [DEPRECATED] Retrieves all user-owned images using pagination.
       rpc :listImagesForUserDeprecated, ::Io::Pagination, stream(::Io::ImageRecord)
+      # Retrieves all images stored under the user account using filters. Required Fields: filters.
       rpc :listImagesForUser, ::Io::Filters, stream(::Io::ImageRecord)
+      # [DEPRECATED] Retrieves all images available to the company.
       rpc :listImagesDeprecated, ::Io::Pagination, stream(::Io::ImageRecord)
+      # Retrieves all images stored under the company using filters. Required Fields: filters.
       rpc :listImages, ::Io::Filters, stream(::Io::ImageRecord)
+      # [DEPRECATED] Returns the count of all images available to the user.
       rpc :countImagesDeprecated, ::Io::Pagination, ::Io::Count
+      # Returns the count of all images available to the user using filters.
       rpc :countImages, ::Io::Filters, ::Io::Count
+      # [DEPRECATED] Returns the count of images stored under the user's account.
       rpc :countImagesForUserDeprecated, ::Io::Pagination, ::Io::Count
+      # Returns the count of images stored under the user's account using filters.
       rpc :countImagesForUser, ::Io::Filters, ::Io::Count
     end
 

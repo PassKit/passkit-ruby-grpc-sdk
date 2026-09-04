@@ -6,6 +6,7 @@ require 'io/core/a_rpc_templates_pb'
 
 module Io
   module Templates
+    # Manages pass templates and designs for Apple Wallet, Google Wallet, and data collection forms.
     class Service
 
       include ::GRPC::GenericService
@@ -14,46 +15,87 @@ module Io
       self.unmarshal_class_method = :decode
       self.service_name = 'io.Templates'
 
+      # Creates a pass template for a protocol and revision. Required fields: protocol, revision, name, colors, fields.
       rpc :createTemplate, ::Io::PassTemplate, ::Io::Id
+      # Updates an existing pass template. Required Fields: id
       rpc :updateTemplate, ::Io::PassTemplate, ::Io::PassTemplate
+      # Retrieves a pass template by ID. Required Fields: id
       rpc :getTemplate, ::Io::Id, ::Io::PassTemplateResponse
+      # Retrieves the default pass template for a given protocol and revision. Required Fields: protocol, revision
       rpc :getDefaultTemplate, ::Io::DefaultTemplateRequest, ::Io::PassTemplate
+      # Copies an existing pass template and returns a new ID. Required Fields: id
       rpc :copyTemplate, ::Io::CopyObjectInput, ::Io::Id
+      # Deletes a pass template. Required Fields: id
       rpc :deleteTemplate, ::Io::Id, ::Google::Protobuf::Empty
+      # [DEPRECATED: OR operator is not supported] Retrieves all user-owned pass templates matching filters. Required Fields: pagination.
       rpc :listTemplatesForUserDeprecated, ::Io::Pagination, stream(::Io::PassTemplateResponse)
+      # Retrieves all user-owned pass templates matching filters. Required Fields: filters.
       rpc :listTemplatesForUser, ::Io::Filters, stream(::Io::PassTemplateResponse)
+      # [DEPRECATED: OR operator is not supported] Retrieves all company-wide pass templates matching filters. Required Fields: pagination.
       rpc :listTemplatesDeprecated, ::Io::Pagination, stream(::Io::PassTemplateResponse)
+      # Retrieves all company-wide pass templates matching filters. Required Fields: filters.
       rpc :listTemplates, ::Io::Filters, stream(::Io::PassTemplateResponse)
+      # [DEPRECATED: OR operator is not supported] Retrieves a count of company-wide pass templates matching filters. Required Fields: pagination.
       rpc :countTemplatesDeprecated, ::Io::Pagination, ::Io::Count
+      # Retrieves a count of company-wide pass templates matching filters. Required Fields: filters.
       rpc :countTemplates, ::Io::Filters, ::Io::Count
+      # [DEPRECATED: OR operator is not supported] Retrieves a count of user-owned pass templates matching filters. Required Fields: filters.
       rpc :countTemplatesForUserDeprecated, ::Io::Pagination, ::Io::Count
+      # Retrieves a count of user-owned pass templates matching filters. Required Fields: filters.
       rpc :countTemplatesForUser, ::Io::Filters, ::Io::Count
+      # Creates a new location object. Required Fields: latitude, longitude, message.
       rpc :createLocation, ::Io::GPSLocation, ::Io::Id
+      # Updates an existing location. Required Fields: id.
       rpc :updateLocation, ::Io::GPSLocation, ::Io::GPSLocation
+      # Retrieves a single location by ID. Required Fields: id.
       rpc :getLocation, ::Io::Id, ::Io::GPSLocation
+      # [DEPRECATED: OR operator is not supported] Lists all location objects matching filters. Required Fields: pagination.
       rpc :listLocationsDeprecated, ::Io::Pagination, stream(::Io::GPSLocation)
+      # Lists all location objects matching filters. Required Fields: filters.
       rpc :listLocations, ::Io::Filters, stream(::Io::GPSLocation)
+      # Copies a location record and returns a new ID. Required Fields: id.
       rpc :copyLocation, ::Io::CopyObjectInput, ::Io::Id
+      # Deletes a location object. Required Fields: id.
       rpc :deleteLocation, ::Io::Id, ::Google::Protobuf::Empty
+      # [DEPRECATED: OR operator is not supported] Retrieves a count of locations that match the supplied criteria. Required: pagination.
       rpc :countLocationsDeprecated, ::Io::Pagination, ::Io::Count
+      # Counts the number of location records that match the supplied filters. Required: filters.
       rpc :countLocations, ::Io::Filters, ::Io::Count
+      # Creates a new beacon object. Required Fields: proximityUUID, lockscreenMessage.
       rpc :createBeacon, ::Io::Beacon, ::Io::Id
+      # Updates an existing beacon object. Required Fields: id.
       rpc :updateBeacon, ::Io::Beacon, ::Io::Beacon
+      # Retrieves a single beacon by ID. Required Fields: id.
       rpc :getBeacon, ::Io::Id, ::Io::Beacon
+      # [DEPRECATED: OR operator is not supported] Retrieves beacon objects that match the supplied criteria. Required Fields: pagination.
       rpc :listBeaconsDeprecated, ::Io::Pagination, stream(::Io::Beacon)
+      # Lists all beacon objects that match the provided filters. Required Fields: filters.
       rpc :listBeacons, ::Io::Filters, stream(::Io::Beacon)
+      # Copies a beacon record and returns a new ID. Required Fields: id.
       rpc :copyBeacon, ::Io::CopyObjectInput, ::Io::Id
+      # Deletes a beacon object. Required Fields: id.
       rpc :deleteBeacon, ::Io::Id, ::Google::Protobuf::Empty
+      # [DEPRECATED: OR operator is not supported] Retrieves a count of beacons that match the supplied criteria. Required Fields: pagination.
       rpc :countBeaconsDeprecated, ::Io::Pagination, ::Io::Count
+      # Returns the count of beacons that match the supplied filters. Required Fields: filters.
       rpc :countBeacons, ::Io::Filters, ::Io::Count
+      # Creates a new link object. Required Fields: url, title, type.
       rpc :createLink, ::Io::Link, ::Io::Id
+      # Updates an existing link object. Required Fields: id.
       rpc :updateLink, ::Io::Link, ::Io::Link
+      # Retrieves a single link by ID. Required Fields: id.
       rpc :getLink, ::Io::Id, ::Io::Link
+      # [DEPRECATED: OR operator is not supported] Retrieves links objects that match the supplied criteria. Required Fields: pagination.
       rpc :listLinksDeprecated, ::Io::Pagination, stream(::Io::Link)
+      # Lists all link objects that match the provided filters. Required Fields: filters.
       rpc :listLinks, ::Io::Filters, stream(::Io::Link)
+      # Copies a link record and returns a new ID. Required Fields: id.
       rpc :copyLink, ::Io::CopyObjectInput, ::Io::Id
+      # Deletes a link object. Required Fields: id.
       rpc :deleteLink, ::Io::Id, ::Google::Protobuf::Empty
+      # [DEPRECATED: OR operator is not supported] Retrieves a count of links that match the supplied criteria. Required Fields: pagination.
       rpc :countLinksDeprecated, ::Io::Pagination, ::Io::Count
+      # Returns the count of links that match the supplied filters. Required Fields: filters.
       rpc :countLinks, ::Io::Filters, ::Io::Count
     end
 
